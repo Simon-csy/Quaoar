@@ -1,19 +1,22 @@
 <!-- Output a single index.html file. Nothing else. -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watching Timeline</title>
-    
+
     <!-- Google Fonts: Space Mono & DM Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    
+
     <style>
         :root {
             --bg: #0f172a;
@@ -80,7 +83,8 @@
         .tl-item {
             position: relative;
             margin-bottom: 56px;
-            opacity: 0; /* Hidden initially for GSAP */
+            opacity: 0;
+            /* Hidden initially for GSAP */
         }
 
         /* The node / dot */
@@ -156,7 +160,8 @@
             font-size: 1.75rem;
             margin: 0 0 12px 0;
             font-weight: 700;
-            padding-right: 40px; /* Space for arrow */
+            padding-right: 40px;
+            /* Space for arrow */
         }
 
         .tl-meta {
@@ -199,7 +204,8 @@
             color: var(--accent);
         }
 
-        .loading, .error {
+        .loading,
+        .error {
             text-align: center;
             font-family: var(--font-display);
             color: var(--text-secondary);
@@ -207,23 +213,42 @@
             border: 1px dashed var(--line);
             border-radius: 16px;
         }
-        
+
         .error {
             color: #ef4444;
             border-color: rgba(239, 68, 68, 0.3);
             background-color: rgba(239, 68, 68, 0.05);
         }
-        
+
         @media (max-width: 600px) {
-            .container { padding: 40px 16px; }
-            .header { margin-bottom: 48px; }
-            h1 { font-size: 2rem; }
-            .tl-card { padding: 24px; }
-            .tl-card::after { display: none; }
-            .tl-title { font-size: 1.25rem; padding-right: 0; }
+            .container {
+                padding: 40px 16px;
+            }
+
+            .header {
+                margin-bottom: 48px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tl-card {
+                padding: 24px;
+            }
+
+            .tl-card::after {
+                display: none;
+            }
+
+            .tl-title {
+                font-size: 1.25rem;
+                padding-right: 0;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -241,19 +266,19 @@
         // Assuming your backend runs on stork.pythonanywhere.com based on previous configuration.
         // NOTE: Ensure your Django app has django-cors-headers installed and configured
         // to allow requests from your GitHub Pages domain.
-        const API_URL = 'https://stork.pythonanywhere.com/api/watching';
-        const POST_BASE_URL = 'https://stork.pythonanywhere.com/post/';
+        const API_URL = 'https://www.simonland.me/api/watching';
+        const POST_BASE_URL = 'https://www.simonland.me/post/';
 
         async function fetchTimeline() {
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                
+
                 const data = await response.json();
                 renderTimeline(data);
             } catch (error) {
                 console.error('Error fetching timeline:', error);
-                
+
                 // Show fallback mock data for demonstration if API fails (optional, remove in prod if desired)
                 // document.getElementById('timeline-container').innerHTML = `
                 //    <div class="error">
@@ -261,7 +286,7 @@
                 //        <small style="opacity:0.7">Make sure your backend is running and CORS is properly configured for your GitHub Pages domain.</small>
                 //    </div>
                 // `;
-                
+
                 // For the sake of the design preview without a live backend:
                 const mockData = [
                     { start: '2023-10-15T00:00:00Z', end: '2023-10-20T00:00:00Z', watching: { name: 'Dune: Part One', type: 'Movie', link: '1', url: 'https://example.com', wiki: 'https://wikipedia.org' } },
@@ -275,10 +300,10 @@
         function formatDate(dateString) {
             if (!dateString) return '';
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
             });
         }
 
@@ -342,4 +367,5 @@
         });
     </script>
 </body>
+
 </html>
