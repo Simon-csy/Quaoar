@@ -353,13 +353,17 @@
         }
 
         function animateTimeline() {
-            gsap.from('.tl-item', {
-                opacity: 0,
-                y: 16,
-                duration: 0.4,
-                stagger: 0.08,
-                ease: 'power2.out'
-            });
+            gsap.fromTo('.tl-item', 
+                { opacity: 0, y: 16 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.4,
+                    stagger: 0.08,
+                    ease: 'power2.out',
+                    clearProps: 'all' // removes inline styles after animation
+                }
+            );
         }
 
         document.addEventListener('DOMContentLoaded', () => {
