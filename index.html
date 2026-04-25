@@ -83,8 +83,6 @@
         .tl-item {
             position: relative;
             margin-bottom: 56px;
-            opacity: 0;
-            /* Hidden initially for GSAP */
         }
 
         /* The node / dot */
@@ -353,16 +351,13 @@
         }
 
         function animateTimeline() {
-            gsap.fromTo('.tl-item', 
-                { opacity: 0, y: 16 },
-                {
-                    opacity: 1,
-                    y: 0,
-                    duration: 0.4,
-                    stagger: 0.08,
-                    ease: 'power2.out'
-                }
-            );
+            gsap.from('.tl-item', {
+                opacity: 0,
+                y: 16,
+                duration: 0.4,
+                stagger: 0.08,
+                ease: 'power2.out'
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
