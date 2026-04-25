@@ -334,13 +334,13 @@
 
                 tlItem.innerHTML = `
                     <span class="tl-date">${dateDisplay}</span>
-                    <a href="${postUrl}" class="tl-card" ${!w.link ? 'style="cursor:default" onclick="event.preventDefault()"' : ''}>
+                    <div class="tl-card" ${w.link ? `onclick="window.location.href='${postUrl}'"` : ''}>
                         <h3 class="tl-title">${w.name || 'Unknown'}</h3>
                         <div class="tl-meta">
                             <span class="tl-type">${w.type || 'Movie'}</span>
                         </div>
                         ${linksHtml ? `<div class="tl-links">${linksHtml}</div>` : ''}
-                    </a>
+                    </div>
                 `;
 
                 container.appendChild(tlItem);
