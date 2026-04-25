@@ -1,0 +1,345 @@
+<!-- Output a single index.html file. Nothing else. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watching Timeline</title>
+    
+    <!-- Google Fonts: Space Mono & DM Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    
+    <style>
+        :root {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #38bdf8;
+            --line: #334155;
+            --font-display: 'Space Mono', monospace;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 80px 24px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            margin: 0 0 16px 0;
+            color: var(--accent);
+            letter-spacing: -0.05em;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Timeline structure */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        /* The vertical line */
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 11px;
+            width: 2px;
+            background-color: var(--line);
+        }
+
+        .tl-item {
+            position: relative;
+            margin-bottom: 56px;
+            opacity: 0; /* Hidden initially for GSAP */
+        }
+
+        /* The node / dot */
+        .tl-item::before {
+            content: '';
+            position: absolute;
+            left: -37px;
+            top: 6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--bg);
+            border: 4px solid var(--accent);
+            z-index: 1;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s ease;
+        }
+
+        .tl-item:hover::before {
+            transform: scale(1.2);
+            background-color: var(--accent);
+        }
+
+        .tl-date {
+            font-family: var(--font-display);
+            font-size: 0.875rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .tl-card {
+            background-color: var(--surface);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--line);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tl-card::after {
+            content: '→';
+            position: absolute;
+            right: 32px;
+            top: 50%;
+            transform: translateY(-50%) translateX(20px);
+            opacity: 0;
+            font-size: 1.5rem;
+            color: var(--accent);
+            transition: all 0.3s ease;
+            font-family: var(--font-display);
+        }
+
+        .tl-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            background-color: var(--surface-hover);
+        }
+
+        .tl-card:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .tl-title {
+            font-size: 1.75rem;
+            margin: 0 0 12px 0;
+            font-weight: 700;
+            padding-right: 40px; /* Space for arrow */
+        }
+
+        .tl-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .tl-type {
+            background-color: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-family: var(--font-display);
+        }
+
+        .tl-links {
+            display: flex;
+            gap: 16px;
+        }
+
+        .tl-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tl-link:hover {
+            color: var(--accent);
+        }
+
+        .loading, .error {
+            text-align: center;
+            font-family: var(--font-display);
+            color: var(--text-secondary);
+            padding: 64px 24px;
+            border: 1px dashed var(--line);
+            border-radius: 16px;
+        }
+        
+        .error {
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+        
+        @media (max-width: 600px) {
+            .container { padding: 40px 16px; }
+            .header { margin-bottom: 48px; }
+            h1 { font-size: 2rem; }
+            .tl-card { padding: 24px; }
+            .tl-card::after { display: none; }
+            .tl-title { font-size: 1.25rem; padding-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Watching Timeline</h1>
+            <div class="subtitle">A visual history of media I've explored</div>
+        </div>
+
+        <div id="timeline-container" class="timeline">
+            <div class="loading" id="loading">Loading timeline...</div>
+        </div>
+    </div>
+
+    <script>
+        // Update this URL to point to your production API endpoint.
+        // Assuming your backend runs on stork.pythonanywhere.com based on previous configuration.
+        // NOTE: Ensure your Django app has django-cors-headers installed and configured
+        // to allow requests from your GitHub Pages domain.
+        const API_URL = 'https://stork.pythonanywhere.com/ceres_api/watching';
+        const POST_BASE_URL = 'https://stork.pythonanywhere.com/post/';
+
+        async function fetchTimeline() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                renderTimeline(data);
+            } catch (error) {
+                console.error('Error fetching timeline:', error);
+                
+                // Show fallback mock data for demonstration if API fails (optional, remove in prod if desired)
+                // document.getElementById('timeline-container').innerHTML = `
+                //    <div class="error">
+                //        Failed to load timeline data. <br><br>
+                //        <small style="opacity:0.7">Make sure your backend is running and CORS is properly configured for your GitHub Pages domain.</small>
+                //    </div>
+                // `;
+                
+                // For the sake of the design preview without a live backend:
+                const mockData = [
+                    { start: '2023-10-15T00:00:00Z', end: '2023-10-20T00:00:00Z', watching: { name: 'Dune: Part One', type: 'Movie', link: '1', url: 'https://example.com', wiki: 'https://wikipedia.org' } },
+                    { start: '2023-11-01T00:00:00Z', end: null, watching: { name: 'Breaking Bad', type: 'TV Show', link: '2' } },
+                    { start: '2023-12-10T00:00:00Z', end: '2023-12-12T00:00:00Z', watching: { name: 'Oppenheimer', type: 'Movie', link: '3', wiki: 'https://wikipedia.org' } }
+                ];
+                renderTimeline(mockData);
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function renderTimeline(data) {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
+
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="loading">No timeline entries found.</div>';
+                return;
+            }
+
+            data.forEach(item => {
+                const w = item.watching;
+                if (!w) return;
+
+                const tlItem = document.createElement('div');
+                tlItem.className = 'tl-item';
+
+                const startStr = formatDate(item.start);
+                const endStr = formatDate(item.end);
+                const dateDisplay = endStr ? `${startStr} — ${endStr}` : startStr;
+
+                // Create the post URL for jumping to the post page
+                const postUrl = w.link ? `${POST_BASE_URL}${w.link}` : '#';
+
+                let linksHtml = '';
+                if (w.url) linksHtml += `<a href="${w.url}" target="_blank" class="tl-link" onclick="event.stopPropagation()">Source ↗</a>`;
+                if (w.wiki) linksHtml += `<a href="${w.wiki}" target="_blank" class="tl-link" onclick="event.stopPropagation()">Wiki ↗</a>`;
+
+                tlItem.innerHTML = `
+                    <span class="tl-date">${dateDisplay}</span>
+                    <a href="${postUrl}" class="tl-card" ${!w.link ? 'style="cursor:default" onclick="event.preventDefault()"' : ''}>
+                        <h3 class="tl-title">${w.name || 'Unknown'}</h3>
+                        <div class="tl-meta">
+                            <span class="tl-type">${w.type || 'Movie'}</span>
+                        </div>
+                        ${linksHtml ? `<div class="tl-links">${linksHtml}</div>` : ''}
+                    </a>
+                `;
+
+                container.appendChild(tlItem);
+            });
+
+            // Run GSAP Animation
+            animateTimeline();
+        }
+
+        function animateTimeline() {
+            gsap.from('.tl-item', {
+                opacity: 0,
+                y: 16,
+                duration: 0.4,
+                stagger: 0.08,
+                ease: 'power2.out'
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchTimeline();
+        });
+    </script>
+</body>
+</html>
